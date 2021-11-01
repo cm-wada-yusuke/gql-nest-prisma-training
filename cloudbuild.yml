@@ -4,20 +4,20 @@ steps:
     args: ['build', '-t', 'gcr.io/$PROJECT_ID/IMAGE', '.']
   # Push the container image to Container Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/$PROJECT_ID/backend_user']
+    args: ['push', 'gcr.io/$PROJECT_ID/backend-user']
   # Deploy container image to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
     args:
       - 'run'
       - 'deploy'
-      - 'backend_user'
+      - 'backend-user'
       - '--image'
-      - 'gcr.io/$PROJECT_ID/backend_user:$COMMIT_SHA'
+      - 'gcr.io/$PROJECT_ID/backend-user:$COMMIT_SHA'
       - '--region'
       - '$_REGION'
 images:
-  - 'gcr.io/$PROJECT_ID/backend_user:$COMMIT_SHA'
+  - 'gcr.io/$PROJECT_ID/backend-user:$COMMIT_SHA'
 
 substitutions:
   _REGION: asia-northeast-2
