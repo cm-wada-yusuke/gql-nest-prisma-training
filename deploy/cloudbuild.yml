@@ -23,7 +23,7 @@ steps:
   - name: 'bash'
     entrypoint: 'echo'
     args:
-      - 'gcloud run services update-traffic ${_SERVICE_NAME} --region=${_REGION} --to-revisions=${_SERVICE_NAME}-${$SHORT_SHA}'
+      - 'gcloud run services update-traffic ${_SERVICE_NAME} --region=${_REGION} --to-revisions=${_SERVICE_NAME}-$SHORT_SHA'
 
 substitutions:
   _REGION: asia-northeast2
