@@ -1,23 +1,31 @@
 steps:
   # Build the container image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE}:$COMMIT_SHA', '.' ]
+    args: ['build', '-t', '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_SERVICE_NAME}:$SHORT_SHA', '.' ]
   # Push the container image to Container Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE}:$COMMIT_SHA']
+    args: ['push', '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_SERVICE_NAME}:$SHORT_SHA']
   # Create Cloud Run Revision using image
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
     args:
       - 'run'
       - 'deploy'
-      - 'backend-user'
+      - ${_SERVICE_NAME}
+      - '--no-traffic'
       - '--image'
-      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE}:$COMMIT_SHA'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_SERVICE_NAME}:$SHORT_SHA'
       - '--region'
       - '$_REGION'
+      - '--revision-suffix'
+      - $SHORT_SHA
+  # Display traffic update command
+  - name: 'bash'
+    entrypoint: 'echo'
+    args:
+      - 'gcloud run services update-traffic ${_SERVICE_NAME} --region=${_REGION} --to-revisions=${_SERVICE_NAME}-${$SHORT_SHA}'
 
 substitutions:
   _REGION: asia-northeast2
   _REPOSITORY: $REPO_NAME
-  _IMAGE: backend-user
+  _SERVICE_NAME: backend-user
