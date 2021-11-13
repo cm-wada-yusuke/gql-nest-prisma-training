@@ -1,0 +1,16 @@
+version: "3"
+
+volumes:
+  db-data:
+
+services:
+  db:
+    image: postgres:14
+    container_name: blog_db
+    volumes:
+      - db-data:/var/lib/postgresql/blog_db/data
+    ports:
+      - "54321:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
