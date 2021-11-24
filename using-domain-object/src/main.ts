@@ -7,7 +7,11 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // バリデーションPipeを追加
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+    }),
+  );
 
   // Primsaがアプリケーションのシャットダウン前に `process.exit()` に反応してシャットダウンされてしまう仕様なので
   // アプリケーションのシャットダウンフックに反応するよう設定を追加する

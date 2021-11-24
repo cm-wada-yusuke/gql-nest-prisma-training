@@ -3,6 +3,7 @@ import { PrismaService } from '../../prisma.service';
 import { Post, Prisma } from '@prisma/client';
 import { PostEntity, PostID } from './entities/post.entity';
 import { PostRepository } from './repositories/post.repository';
+import { FindPostDto } from './dto/find-post.dto';
 
 @Injectable()
 export class PostService {
@@ -11,11 +12,11 @@ export class PostService {
     private readonly prisma: PrismaService,
   ) {}
 
-  // 入力パラメータをどうするか => 再利用を考慮するとDTOよりもドメインオブジェクト（Entity）が良い
-  // 入力パラメータをどうpostWhereUniqueInputに変換するか=>Repositoryに任せるでいいと思う
-  async findPost(id: PostID): Promise<PostEntity> {
+  // Dtoにする場合。DTOがいいとおもう。ドメインオブジェクトレベルまで求めるのは少し酷？
+  async findPost(dto: FindPostDto): Promise<PostEntity> {
     // validated DTO => domain object
-    return this.postRepository.findOne(id);
+    const postID = PostID.fromFindDto(dto);
+    return this.postRepository.findOne(postID);
   }
 
   async posts(params: {

@@ -7,5 +7,5 @@ export class FindPostDto {
       message: 'IDは数値です',
     },
   )
-  id: string;
+  id: number;
 }
