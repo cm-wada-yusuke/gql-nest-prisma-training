@@ -3,6 +3,17 @@ import { PrismaClient } from '@prisma/client';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
+  constructor() {
+    super({
+      log: [
+        { emit: 'event', level: 'query' },
+        { emit: 'stdout', level: 'info' },
+        { emit: 'stdout', level: 'warn' },
+        { emit: 'stdout', level: 'error' },
+      ],
+      errorFormat: 'colorless',
+    });
+  }
   /**
    * https://docs.nestjs.com/recipes/prisma#prisma
    * onModuleInitはオプションです。

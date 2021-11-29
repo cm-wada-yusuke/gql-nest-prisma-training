@@ -1,8 +1,9 @@
+import { UserModule } from './components/users/user.module';
 import { Module } from '@nestjs/common';
 import { PostModule } from './components/posts/post.module';
 
 @Module({
-  imports: [PostModule],
+  imports: [UserModule, PostModule],
   // controllers: [AppController],
   // providers: [AppService, PrismaService, UserService],
 })
