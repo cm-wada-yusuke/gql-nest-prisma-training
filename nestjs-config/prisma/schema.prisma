@@ -1,0 +1,22 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  // output   = "../src/generated/prisma" prisma のコード（node_modules相当）まで生成されてしまう。都合よく型だけ生成してもらうのは難しいかも
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Post {
+  id String @default(uuid()) @id
+  title String
+  published Boolean? @default(false)
+  createdAt  DateTime   @default(now())
+
+  @@map("posts")
+}
+
