@@ -15,8 +15,8 @@ resource "google_cloudbuild_trigger" "deploy-migrate" {
       branch = "^main$"
     }
   }
-  included_files = ["google-cloud-prisma-training/**"]
-  filename       = "google-cloud-prisma-training/cloudbuild.yml"
+  included_files = ["google-cloud-prisma-migrate/**"]
+  filename       = "google-cloud-prisma-migrate/cloudbuild.yml"
   substitutions = {
     _CLOUDSQL_INSTANCE_FULL_NAME    = var.cloudsql_instance_full_name
     _ARTIFACT_REPOSITORY_IMAGE_NAME = "${var.region}-docker.pkg.dev/${var.gcp_project_id}/backend/${var.app_name}"
