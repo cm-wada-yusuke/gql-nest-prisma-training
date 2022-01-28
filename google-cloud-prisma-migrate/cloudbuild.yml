@@ -1,0 +1,40 @@
+steps:
+  - id: build
+    name: "docker"
+    args:
+      - build
+      - --file=Dockerfile
+      - "--tag=$_ARTIFACT_REPOSITORY_IMAGE_NAME:latest"
+      - --cache-from=$_ARTIFACT_REPOSITORY_IMAGE_NAME:latest
+      - .
+    dir: "google-cloud-prisma-migrate"
+  - id: push
+    name: "docker"
+    args:
+      - push
+      - --all-tags
+      - $_ARTIFACT_REPOSITORY_IMAGE_NAME
+    dir: "google-cloud-prisma-migrate"
+    waitFor: ["build"]
+  - id: "apply-migrations"
+    name: "gcr.io/google-appengine/exec-wrapper"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - "/buildstep/execute.sh -i $_ARTIFACT_REPOSITORY_IMAGE_NAME:latest -e DATABASE_URL=$$PRISMA_MIGRATE_DATABASE_URL -s $_CLOUDSQL_INSTANCE_FULL_NAME -- yarn prisma migrate deploy"
+    secretEnv: ["PRISMA_MIGRATE_DATABASE_URL"]
+    dir: "google-cloud-prisma-migrate"
+    waitFor: ["push"]
+timeout: 2000s
+substitutions:
+  _CLOUDSQL_INSTANCE_FULL_NAME: by-terraform
+  _ARTIFACT_REPOSITORY_IMAGE_NAME: by-terraform
+availableSecrets:
+  secretManager:
+    - versionName: projects/$PROJECT_ID/secrets/PRISMA_MIGRATE_DATABASE_URL/versions/latest
+      env: PRISMA_MIGRATE_DATABASE_URL
+
+# ビルド結果に生成したイメージ情報を表示する
+# https://cloud.google.com/build/docs/building/build-containers
+images:
+  - $_ARTIFACT_REPOSITORY_IMAGE_NAME:latest
