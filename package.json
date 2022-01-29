@@ -6,6 +6,6 @@
   "private": true,
   "license": "UNLICENSED",
   "devDependencies": {
-    "@nestjs/cli": "^8.0.0"
+    "@nestjs/cli": "^8.2.0"
   }
 }
