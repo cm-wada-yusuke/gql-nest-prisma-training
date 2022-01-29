@@ -9,7 +9,7 @@ resource "google_sql_database_instance" "prisma-migrate" {
   name                = "prisma-migrate"
   database_version    = "POSTGRES_14"
   region              = var.target_region
-  deletion_protection = true # 検証で作成するため、あとで消したい
+  deletion_protection = false # 検証で作成するため、あとで消したい
 
   settings {
     tier              = "db-f1-micro"
