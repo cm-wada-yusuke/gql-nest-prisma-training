@@ -2,9 +2,9 @@
   "name": "frontend",
   "private": true,
   "scripts": {
-    "dev": "next dev -p ${PORT:-3333}",
+    "dev": "next dev -p ${PORT:-3332}",
     "build": "next build",
-    "start": "next start -p ${PORT:-3333}",
+    "start": "next start -p ${PORT:-3332}",
     "lint": "next lint"
   },
   "dependencies": {

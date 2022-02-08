@@ -2,10 +2,11 @@
   "name": "frontend",
   "private": true,
   "scripts": {
-    "dev": "next dev -p ${PORT:-3333}",
+    "dev": "next dev -p ${PORT:-3332}",
     "build": "next build",
-    "start": "next start -p ${PORT:-3333}",
-    "lint": "next lint"
+    "start": "next start -p ${PORT:-3332}",
+    "lint": "next lint",
+    "codegen": "graphql-codegen --config codegen.yml"
   },
   "dependencies": {
     "graphql-tag": "^2.12.6",
@@ -17,11 +18,15 @@
     "urql": "^2.1.0"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "2.5.0",
+    "@graphql-codegen/typescript-urql": "^3.5.1",
     "@types/node": "17.0.13",
     "@types/react": "17.0.38",
     "eslint": "8.8.0",
     "eslint-config-next": "12.0.9",
     "graphql": "^16.3.0",
-    "typescript": "4.5.5"
+    "typescript": "4.5.5",
+    "@graphql-codegen/typescript": "2.4.3",
+    "@graphql-codegen/typescript-operations": "2.2.4"
   }
 }

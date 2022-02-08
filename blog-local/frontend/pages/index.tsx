@@ -2,6 +2,7 @@ import gql from "graphql-tag";
 import type { GetServerSideProps, NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
+import { PostIndexPageDocument } from "../src/graphql/generated.graphql";
 import { urqlClient } from "../src/libs/gql-requests";
 import styles from "../styles/Home.module.css";
 
@@ -61,7 +62,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async () => {
         }
       }
     `;
-    const result = await client.query(postsQuery, {}).toPromise();
+    const result = await client.query(PostIndexPageDocument, {}).toPromise();
     console.log(result.data);
 
     return {
