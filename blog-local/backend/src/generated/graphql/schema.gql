@@ -9,4 +9,5 @@ type PostModel {
 
 type Query {
   posts: [PostModel!]
+  prismaPosts: [PostModel!]
 }
