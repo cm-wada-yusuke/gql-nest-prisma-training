@@ -1,0 +1,8 @@
+query PostIndexPage {
+  posts {
+    id
+    title
+    type
+    publishDate
+  }
+}
