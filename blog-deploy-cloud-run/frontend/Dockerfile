@@ -1,8 +1,5 @@
 FROM node:16 AS builder
 
-ARG google_analytics_id
-ARG ogp_site_home
-ARG contents_bucket_name
 ARG graphql_endpoint
 
 # ビルドには devDependencies もインストールする必要があるため
