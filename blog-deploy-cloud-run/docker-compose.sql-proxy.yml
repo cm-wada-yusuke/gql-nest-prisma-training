@@ -1,0 +1,19 @@
+version: "3"
+
+# Cloud SQL 環境のDBにアクセスするプロキシ
+services:
+  blog-training-db-cloud-sql:
+    image: "gcr.io/cloudsql-docker/gce-proxy:latest"
+    container_name: blog-training-db-cloud-sql
+    command:
+      [
+        "/cloud_sql_proxy",
+        "-instances=$CLOUDSQL_PROXY_CONNECTION_NAME=tcp:0.0.0.0:5432",
+        "-credential_file=/gcp-key.blog-training-app.json",
+      ]
+    volumes:
+      - type: bind # ファイルが存在しなければエラーとする
+        source: "~/.config/gcloud/application_default_credentials.json"
+        target: "/gcp-key.blog-training-app.json"
+    ports:
+      - "45432:5432" # ローカルのDBとぶつからないようにポート変更
