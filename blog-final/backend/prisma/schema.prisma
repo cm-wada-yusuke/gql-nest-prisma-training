@@ -1,0 +1,30 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Post {
+  id           String    @id @default(uuid())
+  title        String
+  emoji        String?
+  type         String
+  thumbNailUrl String?   @map("thumb_nail_url")
+  excerpt      String?
+  contentPath  String    @unique @map("content_path")
+  md5Hash      String    @map("md5_hash")
+  published    Boolean?  @default(false)
+  publishDate  DateTime? @map("publish_date")
+  like         Int       @default(0)
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  @@index([contentPath])
+  @@map("posts")
+}
