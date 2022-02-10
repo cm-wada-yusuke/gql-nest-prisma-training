@@ -13,7 +13,7 @@ resource "google_sql_database_instance" "blog-training-db" {
 
   settings {
     tier              = "db-f1-micro"
-    availability_type = "REGIONAL"
+    availability_type = "ZONAL"
     disk_size         = "20"
     disk_type         = "PD_SSD"
 
