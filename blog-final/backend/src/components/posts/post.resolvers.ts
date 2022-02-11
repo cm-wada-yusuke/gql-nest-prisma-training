@@ -5,12 +5,15 @@ import { GetPostsArgs } from './interfaces/get-posts-connection.args';
 import { GoogleStorageRepository } from '@pb-components/bucket-assets/repositories/google-storage.repository';
 import matter from 'gray-matter';
 import { FindPostArgs } from './interfaces/find-post-args';
+import { ImpressionService } from '@pb-components/impressions/impression.service';
+import { ImpressionModel } from '@pb-components/impressions/interfaces/impression.model';
 
 @Resolver((of) => PostModel)
 export class PostsResolver {
   constructor(
     private readonly prisma: PrismaService,
     private readonly gcsRepository: GoogleStorageRepository,
+    private impressionService: ImpressionService,
   ) {}
 
   @Query(() => [PostModel], { name: 'fixedPosts', nullable: true })
@@ -66,5 +69,11 @@ export class PostsResolver {
     const markdown = await this.gcsRepository.download(contentPath);
     const { content } = matter(markdown);
     return content;
+  }
+
+  @ResolveField(() => [ImpressionModel], { name: 'impressions', nullable: false })
+  async impressions(@Parent() post: PostModel) {
+    const { id } = post;
+    return this.impressionService.search({ postId: id });
   }
 }

@@ -1,9 +1,12 @@
 // const OGP_SITE_HOME = process.env.NEXT_PUBLIC_OGP_SITE_HOME!;
 // const CONTENTS_BUCKET_NAME = process.env.NEXT_PUBLIC_CONTENTS_BUCKET_NAME!;
-// const NEXT_PUBLIC_GRAPHQL_ENDPOINT = process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT!;
 // console.log('OGP_SITE_HOME', OGP_SITE_HOME);
 // console.log('CONTENTS_BUCKET_NAME', CONTENTS_BUCKET_NAME);
 
+const NEXT_PUBLIC_GRAPHQL_ENDPOINT = process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT!;
+export function getGraphqlEndpoint(): string {
+  return NEXT_PUBLIC_GRAPHQL_ENDPOINT;
+}
 
 /**
  * /posts/articles/2021/github-actions-create-diary => posts/articles/2021/github-actions-create-diary.md

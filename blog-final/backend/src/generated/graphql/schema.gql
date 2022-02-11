@@ -2,10 +2,30 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+input CreateImpressionInput {
+  comment: String
+  postId: String!
+  sticker: String!
+  twitterId: String
+}
+
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
 scalar DateTime
+
+type ImpressionModel {
+  comment: String
+  createdAt: DateTime
+  id: ID!
+  postId: String!
+  sticker: String!
+  twitterId: String
+}
+
+type Mutation {
+  addImpression(input: CreateImpressionInput!): ImpressionModel!
+}
 
 type PostModel {
   bodyMarkdown: String!
@@ -13,6 +33,7 @@ type PostModel {
   emoji: String
   excerpt: String
   id: ID!
+  impressions: [ImpressionModel!]!
   publishDate: DateTime
   published: Boolean
   thumbNailUrl: String
@@ -31,6 +52,7 @@ type ProfileModel {
 type Query {
   findPost(contentPath: String, id: String): PostModel!
   fixedPosts: [PostModel!]
+  impressions(first: Int, postId: String, sortAs: String = "desc"): [ImpressionModel!]
   posts(type: [String!]): [PostModel!]
   prismaPosts: [PostModel!]
   profile: ProfileModel
