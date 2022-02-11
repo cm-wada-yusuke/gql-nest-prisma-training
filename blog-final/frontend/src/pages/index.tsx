@@ -1,22 +1,15 @@
-import gql from "graphql-tag";
-import type { GetServerSideProps, NextPage } from "next";
-import { PostIndexPageDocument } from "@pb-graphql/generated.graphql";
-import { urqlClient } from "@pb-libs/gql-requests";
+import { Box, Stack, Typography } from "@mui/material";
+import { PostListView } from "@pb-components/post/PostListView";
 import {
-  Avatar,
-  Box,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
-  Stack,
-} from "@mui/material";
+  PostFragment,
+  PostIndexPageDocument,
+} from "@pb-graphql/generated.graphql";
+import { urqlClient } from "@pb-libs/gql-requests";
+import type { GetServerSideProps, NextPage } from "next";
 
 type Props = {
-  posts: {
-    id: string;
-    title: string;
-  }[];
+  articles: PostFragment[];
+  diaries: PostFragment[];
 };
 
 const Home: NextPage<Props> = (props) => {
@@ -26,16 +19,10 @@ const Home: NextPage<Props> = (props) => {
         minHeight: "100vh",
       }}
     >
-      <List sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}>
-        {props.posts.map((post) => (
-          <ListItem key={post.id}>
-            <ListItemAvatar>
-              <Avatar>絵</Avatar>
-            </ListItemAvatar>
-            <ListItemText primary={post.title} secondary="公開日" />
-          </ListItem>
-        ))}
-      </List>
+      <Typography variant="h4">Articles</Typography>
+      <PostListView posts={props.articles} />
+      <Typography variant="h4">Diaries</Typography>
+      <PostListView posts={props.diaries} />
       <Box
         sx={{
           bgColor: "palette.primary.dark",
@@ -65,21 +52,13 @@ export const getServerSideProps: GetServerSideProps<Props> = async () => {
   try {
     const client = await urqlClient();
 
-    // 変数なしでGraphQL呼び出し
-    const postsQuery = gql`
-      query {
-        posts {
-          id
-          title
-        }
-      }
-    `;
     const result = await client.query(PostIndexPageDocument, {}).toPromise();
     console.log(result.data);
 
     return {
       props: {
-        posts: result.data.posts,
+        articles: result.data.articles,
+        diaries: result.data.diaries,
       },
     };
   } catch (e) {
