@@ -8,6 +8,7 @@ import { WinstonModule } from 'nest-winston';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PostsModule } from './components/posts/posts.module';
+import { ImpressionModule } from '@pb-components/impressions/impression.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { PostsModule } from './components/posts/posts.module';
     }),
     PostsModule,
     ProfileModule,
+    ImpressionModule,
   ],
   controllers: [AppController],
   providers: [AppService],

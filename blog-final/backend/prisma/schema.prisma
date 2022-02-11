@@ -11,20 +11,33 @@ datasource db {
 }
 
 model Post {
-  id           String    @id @default(uuid())
+  id           String       @id @default(uuid())
   title        String
   emoji        String?
   type         String
-  thumbNailUrl String?   @map("thumb_nail_url")
+  thumbNailUrl String?      @map("thumb_nail_url")
   excerpt      String?
-  contentPath  String    @unique @map("content_path")
-  md5Hash      String    @map("md5_hash")
-  published    Boolean?  @default(false)
-  publishDate  DateTime? @map("publish_date")
-  like         Int       @default(0)
-  createdAt    DateTime  @default(now()) @map("created_at")
-  updatedAt    DateTime  @updatedAt @map("updated_at")
+  contentPath  String       @unique @map("content_path")
+  md5Hash      String       @map("md5_hash")
+  published    Boolean?     @default(false)
+  publishDate  DateTime?    @map("publish_date")
+  impressions  Impression[]
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
 
   @@index([contentPath])
   @@map("posts")
+}
+
+model Impression {
+  id        String   @id @default(uuid())
+  sticker   String   @db.VarChar(10)
+  comment   String?  @db.VarChar(1000)
+  twitterId String?  @map("twitter_id") @db.VarChar(100)
+  post      Post     @relation(fields: [postId], references: [id], map: "impressions_postId_fkey")
+  postId    String   @map("post_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("impressions")
 }

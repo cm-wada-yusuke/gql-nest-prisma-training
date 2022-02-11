@@ -1,16 +1,17 @@
 import { Box, Stack, Typography } from "@mui/material";
+import { ImpressionContainer } from "@pb-components/impression/ImpressionContainer";
 import {
   PostDetailPageDocument,
   PostFragment,
 } from "@pb-graphql/generated.graphql";
 import { isoStringToJstDate } from "@pb-libs/date";
 import { urqlClient } from "@pb-libs/gql-requests";
-import { contentPath } from "@pb-libs/site";
+import { contentPath, getGraphqlEndpoint } from "@pb-libs/site";
 import { GetServerSideProps, NextPage } from "next";
+import { withUrqlClient } from "next-urql";
 import React from "react";
+import "zenn-content-css";
 import markdownToHtml from "zenn-markdown-html";
-import 'zenn-content-css';
-
 
 type Props = {
   post: PostFragment;
@@ -56,6 +57,7 @@ const Page: NextPage<Props> = ({ post, bodyHtml }) => {
               }}
             ></div>
           </Box>
+          <ImpressionContainer postId={post.id} />
         </Stack>
       </article>
     </Box>
@@ -68,7 +70,9 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
   try {
     // slug 配列を 検索用の contentPath に変換する
     const resolvedSlug = ["posts"].concat(params!.slug as string[]); // エラーなら404なので!使っちゃう
+
     const client = await urqlClient();
+
     const result = await client
       .query(PostDetailPageDocument, {
         contentPath: contentPath(resolvedSlug.join("/")),
@@ -77,7 +81,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
 
     const post = result.data.post;
     const bodyHtml = markdownToHtml(post.bodyMarkdown); // サーバー側で実行する必要あり
-    console.log(post);
+    // console.log(ssrCache.extractData());
 
     return {
       props: {
@@ -92,4 +96,10 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
     };
   }
 };
-export default Page;
+
+export default withUrqlClient(
+  (_ssrExchange, ctx) => ({
+    url: getGraphqlEndpoint(),
+  }),
+  { ssr: false }
+)(Page);

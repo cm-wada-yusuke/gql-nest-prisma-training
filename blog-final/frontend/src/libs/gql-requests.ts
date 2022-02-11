@@ -1,5 +1,5 @@
-import { initUrqlClient } from 'next-urql';
-import { Client } from 'urql';
+import { initUrqlClient } from "next-urql";
+import { Client, Exchange } from "urql";
 
 const GRAPHQL_ENDPOINT = process.env.GRAPHQL_ENDPOINT!;
 
@@ -9,10 +9,10 @@ export function urqlClient(): Promise<Client> {
       {
         url: GRAPHQL_ENDPOINT,
       },
-      false,
+      false
     );
     if (!client) {
-      reject(Error('Failed to init initUrqlClient.'));
+      reject(Error("Failed to init initUrqlClient."));
     } else {
       resolve(client);
     }

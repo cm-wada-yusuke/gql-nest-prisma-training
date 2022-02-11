@@ -15,6 +15,16 @@ fragment Profile on ProfileModel {
     github
 }
 
+fragment Impression on ImpressionModel {
+  id
+  comment
+  createdAt
+  sticker
+  twitterId
+  postId
+}
+
+
 query PostIndexPage {
   articles: posts(type: ["article"]) {
     ...Post
@@ -29,9 +39,22 @@ query PostIndexPage {
 
 query PostDetailPage($contentPath: String) {
   post: findPost(contentPath: $contentPath) {
-    contentPath
-    title
-    publishDate
+    ...Post
     bodyMarkdown
+    impressions {
+      ...Impression
+    }
+  }
+}
+
+query ImpressionContainer($postId: String!) {
+  impressions(postId: $postId, sortAs: "asc") {
+    ...Impression
+  }
+}
+
+mutation Impression($input: CreateImpressionInput!) {
+  addImpression(input: $input) {
+    ...Impression
   }
 }
