@@ -1,8 +1,16 @@
-query PostIndexPage {
-  posts {
+fragment Post on PostModel {
     id
     title
     type
     publishDate
+    emoji
+}
+
+query PostIndexPage {
+  articles: posts(type: ["article"]) {
+    ...Post
+  }
+  diaries: posts(type: ["diary"]) {
+    ...Post
   }
 }

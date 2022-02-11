@@ -42,22 +42,32 @@ export type QueryPostsArgs = {
   type?: InputMaybe<Array<Scalars['String']>>;
 };
 
+export type PostFragment = { __typename?: 'PostModel', id: string, title: string, type: string, publishDate?: any | null, emoji?: string | null };
+
 export type PostIndexPageQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type PostIndexPageQuery = { __typename?: 'Query', posts?: Array<{ __typename?: 'PostModel', id: string, title: string, type: string, publishDate?: any | null }> | null };
+export type PostIndexPageQuery = { __typename?: 'Query', articles?: Array<{ __typename?: 'PostModel', id: string, title: string, type: string, publishDate?: any | null, emoji?: string | null }> | null, diaries?: Array<{ __typename?: 'PostModel', id: string, title: string, type: string, publishDate?: any | null, emoji?: string | null }> | null };
 
-
-export const PostIndexPageDocument = gql`
-    query PostIndexPage {
-  posts {
-    id
-    title
-    type
-    publishDate
-  }
+export const PostFragmentDoc = gql`
+    fragment Post on PostModel {
+  id
+  title
+  type
+  publishDate
+  emoji
 }
     `;
+export const PostIndexPageDocument = gql`
+    query PostIndexPage {
+  articles: posts(type: ["article"]) {
+    ...Post
+  }
+  diaries: posts(type: ["diary"]) {
+    ...Post
+  }
+}
+    ${PostFragmentDoc}`;
 
 export function usePostIndexPageQuery(options?: Omit<Urql.UseQueryArgs<PostIndexPageQueryVariables>, 'query'>) {
   return Urql.useQuery<PostIndexPageQuery>({ query: PostIndexPageDocument, ...options });
