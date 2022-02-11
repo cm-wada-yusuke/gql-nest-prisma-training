@@ -1,4 +1,5 @@
-import { Module } from '@nestjs/common';
+import { ProfileModule } from './components/profile/profile.module';
+import { CacheModule, Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { PrismaModule } from '@pb-components/prisma/prisma.module';
 import { PbEnvModule } from '@pb-config/environments/pb-env.module';
@@ -27,7 +28,11 @@ import { PostsModule } from './components/posts/posts.module';
         prismaOptions: env.PrismaOptionsFactory,
       }),
     }),
+    CacheModule.register({
+      isGlobal: true,
+    }),
     PostsModule,
+    ProfileModule,
   ],
   controllers: [AppController],
   providers: [AppService],

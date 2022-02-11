@@ -20,9 +20,18 @@ type PostModel {
   type: String!
 }
 
+type ProfileModel {
+  github: String!
+  handleName: String!
+  position: String!
+  summary: String
+  twitter: String!
+}
+
 type Query {
   findPost(contentPath: String, id: String): PostModel!
   fixedPosts: [PostModel!]
   posts(type: [String!]): [PostModel!]
   prismaPosts: [PostModel!]
+  profile: ProfileModel
 }
