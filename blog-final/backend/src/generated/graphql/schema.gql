@@ -2,6 +2,11 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+interface Connection {
+  nodes: [Node!]!
+  pageInfo: PageInfoModel!
+}
+
 input CreateImpressionInput {
   comment: String
   postId: String!
@@ -27,7 +32,18 @@ type Mutation {
   addImpression(input: CreateImpressionInput!): ImpressionModel!
 }
 
-type PostModel {
+interface Node {
+  id: ID!
+}
+
+type PageInfoModel {
+  endCursor: String
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+}
+
+type PostModel implements Node {
   bodyMarkdown: String!
   contentPath: String!
   emoji: String
@@ -39,6 +55,11 @@ type PostModel {
   thumbNailUrl: String
   title: String!
   type: String!
+}
+
+type PostsConnection implements Connection {
+  nodes: [PostModel!]!
+  pageInfo: PageInfoModel!
 }
 
 type ProfileModel {
@@ -54,6 +75,7 @@ type Query {
   fixedPosts: [PostModel!]
   impressions(first: Int, postId: String, sortAs: String = "desc"): [ImpressionModel!]
   posts(type: [String!]): [PostModel!]
+  postsConnection(cursor: String, first: Int, last: Int, type: [String!]): PostsConnection
   prismaPosts: [PostModel!]
   profile: ProfileModel
 }
