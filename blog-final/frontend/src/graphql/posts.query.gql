@@ -4,6 +4,7 @@ fragment Post on PostModel {
     type
     publishDate
     emoji
+    contentPath
 }
 
 query PostIndexPage {
@@ -12,5 +13,14 @@ query PostIndexPage {
   }
   diaries: posts(type: ["diary"]) {
     ...Post
+  }
+}
+
+query PostDetailPage($contentPath: String) {
+  post: findPost(contentPath: $contentPath) {
+    contentPath
+    title
+    publishDate
+    bodyMarkdown
   }
 }

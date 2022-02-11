@@ -31,6 +31,12 @@ module "cloud-run" {
   gcp_project_id = var.gcp_project_id
 }
 
+## Cloud Storage ##
+module "cloud-storage" {
+  source         = "./modules/cloud-storage"
+  gcp_project_id = var.gcp_project_id
+}
+
 # Cloud SQL
 module "cloud-sql" {
   source        = "./modules/cloud-sql"

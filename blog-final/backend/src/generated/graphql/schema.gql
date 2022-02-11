@@ -8,6 +8,7 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 scalar DateTime
 
 type PostModel {
+  bodyMarkdown: String!
   contentPath: String!
   emoji: String
   excerpt: String
@@ -20,6 +21,7 @@ type PostModel {
 }
 
 type Query {
+  findPost(contentPath: String, id: String): PostModel!
   fixedPosts: [PostModel!]
   posts(type: [String!]): [PostModel!]
   prismaPosts: [PostModel!]
