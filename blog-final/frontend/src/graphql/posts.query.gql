@@ -58,3 +58,25 @@ mutation Impression($input: CreateImpressionInput!) {
     ...Impression
   }
 }
+
+fragment PageInfo on PageInfoModel {
+  startCursor
+  endCursor
+  hasNextPage
+  hasPreviousPage
+}
+
+query PostsAllPage($cursor: String, $first: Int, $last: Int) {
+  allPublished: postsConnection(
+    cursor: $cursor
+    first: $first
+    last: $last
+  ) {
+    nodes {
+      ...Post
+    }
+    pageInfo {
+      ...PageInfo
+    }
+  }
+}

@@ -17,6 +17,11 @@ export type Scalars = {
   DateTime: any;
 };
 
+export type Connection = {
+  nodes: Array<Node>;
+  pageInfo: PageInfoModel;
+};
+
 export type CreateImpressionInput = {
   comment?: InputMaybe<Scalars['String']>;
   postId: Scalars['String'];
@@ -44,7 +49,19 @@ export type MutationAddImpressionArgs = {
   input: CreateImpressionInput;
 };
 
-export type PostModel = {
+export type Node = {
+  id: Scalars['ID'];
+};
+
+export type PageInfoModel = {
+  __typename?: 'PageInfoModel';
+  endCursor?: Maybe<Scalars['String']>;
+  hasNextPage: Scalars['Boolean'];
+  hasPreviousPage: Scalars['Boolean'];
+  startCursor?: Maybe<Scalars['String']>;
+};
+
+export type PostModel = Node & {
   __typename?: 'PostModel';
   bodyMarkdown: Scalars['String'];
   contentPath: Scalars['String'];
@@ -57,6 +74,12 @@ export type PostModel = {
   thumbNailUrl?: Maybe<Scalars['String']>;
   title: Scalars['String'];
   type: Scalars['String'];
+};
+
+export type PostsConnection = Connection & {
+  __typename?: 'PostsConnection';
+  nodes: Array<PostModel>;
+  pageInfo: PageInfoModel;
 };
 
 export type ProfileModel = {
@@ -74,6 +97,7 @@ export type Query = {
   fixedPosts?: Maybe<Array<PostModel>>;
   impressions?: Maybe<Array<ImpressionModel>>;
   posts?: Maybe<Array<PostModel>>;
+  postsConnection?: Maybe<PostsConnection>;
   prismaPosts?: Maybe<Array<PostModel>>;
   profile?: Maybe<ProfileModel>;
 };
@@ -93,6 +117,14 @@ export type QueryImpressionsArgs = {
 
 
 export type QueryPostsArgs = {
+  type?: InputMaybe<Array<Scalars['String']>>;
+};
+
+
+export type QueryPostsConnectionArgs = {
+  cursor?: InputMaybe<Scalars['String']>;
+  first?: InputMaybe<Scalars['Int']>;
+  last?: InputMaybe<Scalars['Int']>;
   type?: InputMaybe<Array<Scalars['String']>>;
 };
 
@@ -128,6 +160,17 @@ export type ImpressionMutationVariables = Exact<{
 
 export type ImpressionMutation = { __typename?: 'Mutation', addImpression: { __typename?: 'ImpressionModel', id: string, comment?: string | null, createdAt?: any | null, sticker: string, twitterId?: string | null, postId: string } };
 
+export type PageInfoFragment = { __typename?: 'PageInfoModel', startCursor?: string | null, endCursor?: string | null, hasNextPage: boolean, hasPreviousPage: boolean };
+
+export type PostsAllPageQueryVariables = Exact<{
+  cursor?: InputMaybe<Scalars['String']>;
+  first?: InputMaybe<Scalars['Int']>;
+  last?: InputMaybe<Scalars['Int']>;
+}>;
+
+
+export type PostsAllPageQuery = { __typename?: 'Query', allPublished?: { __typename?: 'PostsConnection', nodes: Array<{ __typename?: 'PostModel', id: string, title: string, type: string, publishDate?: any | null, emoji?: string | null, contentPath: string }>, pageInfo: { __typename?: 'PageInfoModel', startCursor?: string | null, endCursor?: string | null, hasNextPage: boolean, hasPreviousPage: boolean } } | null };
+
 export const PostFragmentDoc = gql`
     fragment Post on PostModel {
   id
@@ -155,6 +198,14 @@ export const ImpressionFragmentDoc = gql`
   sticker
   twitterId
   postId
+}
+    `;
+export const PageInfoFragmentDoc = gql`
+    fragment PageInfo on PageInfoModel {
+  startCursor
+  endCursor
+  hasNextPage
+  hasPreviousPage
 }
     `;
 export const PostIndexPageDocument = gql`
@@ -212,4 +263,21 @@ export const ImpressionDocument = gql`
 
 export function useImpressionMutation() {
   return Urql.useMutation<ImpressionMutation, ImpressionMutationVariables>(ImpressionDocument);
+};
+export const PostsAllPageDocument = gql`
+    query PostsAllPage($cursor: String, $first: Int, $last: Int) {
+  allPublished: postsConnection(cursor: $cursor, first: $first, last: $last) {
+    nodes {
+      ...Post
+    }
+    pageInfo {
+      ...PageInfo
+    }
+  }
+}
+    ${PostFragmentDoc}
+${PageInfoFragmentDoc}`;
+
+export function usePostsAllPageQuery(options?: Omit<Urql.UseQueryArgs<PostsAllPageQueryVariables>, 'query'>) {
+  return Urql.useQuery<PostsAllPageQuery>({ query: PostsAllPageDocument, ...options });
 };
