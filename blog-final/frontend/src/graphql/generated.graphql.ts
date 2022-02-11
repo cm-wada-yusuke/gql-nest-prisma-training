@@ -31,12 +31,22 @@ export type PostModel = {
   type: Scalars['String'];
 };
 
+export type ProfileModel = {
+  __typename?: 'ProfileModel';
+  github: Scalars['String'];
+  handleName: Scalars['String'];
+  position: Scalars['String'];
+  summary?: Maybe<Scalars['String']>;
+  twitter: Scalars['String'];
+};
+
 export type Query = {
   __typename?: 'Query';
   findPost: PostModel;
   fixedPosts?: Maybe<Array<PostModel>>;
   posts?: Maybe<Array<PostModel>>;
   prismaPosts?: Maybe<Array<PostModel>>;
+  profile?: Maybe<ProfileModel>;
 };
 
 
@@ -52,10 +62,12 @@ export type QueryPostsArgs = {
 
 export type PostFragment = { __typename?: 'PostModel', id: string, title: string, type: string, publishDate?: any | null, emoji?: string | null, contentPath: string };
 
+export type ProfileFragment = { __typename?: 'ProfileModel', handleName: string, position: string, summary?: string | null, twitter: string, github: string };
+
 export type PostIndexPageQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type PostIndexPageQuery = { __typename?: 'Query', articles?: Array<{ __typename?: 'PostModel', id: string, title: string, type: string, publishDate?: any | null, emoji?: string | null, contentPath: string }> | null, diaries?: Array<{ __typename?: 'PostModel', id: string, title: string, type: string, publishDate?: any | null, emoji?: string | null, contentPath: string }> | null };
+export type PostIndexPageQuery = { __typename?: 'Query', articles?: Array<{ __typename?: 'PostModel', id: string, title: string, type: string, publishDate?: any | null, emoji?: string | null, contentPath: string }> | null, diaries?: Array<{ __typename?: 'PostModel', id: string, title: string, type: string, publishDate?: any | null, emoji?: string | null, contentPath: string }> | null, profile?: { __typename?: 'ProfileModel', handleName: string, position: string, summary?: string | null, twitter: string, github: string } | null };
 
 export type PostDetailPageQueryVariables = Exact<{
   contentPath?: InputMaybe<Scalars['String']>;
@@ -74,6 +86,15 @@ export const PostFragmentDoc = gql`
   contentPath
 }
     `;
+export const ProfileFragmentDoc = gql`
+    fragment Profile on ProfileModel {
+  handleName
+  position
+  summary
+  twitter
+  github
+}
+    `;
 export const PostIndexPageDocument = gql`
     query PostIndexPage {
   articles: posts(type: ["article"]) {
@@ -82,8 +103,12 @@ export const PostIndexPageDocument = gql`
   diaries: posts(type: ["diary"]) {
     ...Post
   }
+  profile {
+    ...Profile
+  }
 }
-    ${PostFragmentDoc}`;
+    ${PostFragmentDoc}
+${ProfileFragmentDoc}`;
 
 export function usePostIndexPageQuery(options?: Omit<Urql.UseQueryArgs<PostIndexPageQueryVariables>, 'query'>) {
   return Urql.useQuery<PostIndexPageQuery>({ query: PostIndexPageDocument, ...options });
