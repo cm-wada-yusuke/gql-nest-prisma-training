@@ -52,10 +52,10 @@ steps:
       - --no-cpu-throttling
       - --ingress=all
       - --set-env-vars=GCP_PROJECT_ID=$PROJECT_ID
-      # - --set-env-vars=CONTENTS_BUCKET_NAME=$_CONTENTS_BUCKET_NAME
+      - --set-env-vars=CONTENTS_BUCKET_NAME=$_CONTENTS_BUCKET_NAME
       - --update-secrets=DATABASE_URL=BLOG_TRAINING_DATABASE_URL:latest
-      # - --update-secrets=MICROCMS_KEY=MICROCMS_KEY:latest
-      # - --update-secrets=MICROCMS_ENDPOINT=MICROCMS_ENDPOINT:latest
+      - --update-secrets=MICROCMS_KEY=MICROCMS_KEY:latest
+      - --update-secrets=MICROCMS_ENDPOINT=MICROCMS_ENDPOINT:latest
     dir: "blog-final/backend"
     waitFor: ["apply-migrations"]
 timeout: 2000s
@@ -64,7 +64,7 @@ substitutions:
   _CLOUDSQL_INSTANCE_FULL_NAME: by-terraform
   _ARTIFACT_REPOSITORY_IMAGE_NAME: by-terraform
   _SERVICE_ACCOUNT: by-terraform
-  # _CONTENTS_BUCKET_NAME: by-terraform
+  _CONTENTS_BUCKET_NAME: by-terraform
 availableSecrets:
   secretManager:
     - versionName: projects/$PROJECT_ID/secrets/BLOG_TRAINING_DATABASE_URL/versions/latest

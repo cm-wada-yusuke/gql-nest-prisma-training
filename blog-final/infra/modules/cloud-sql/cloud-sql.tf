@@ -12,7 +12,7 @@ resource "google_sql_database_instance" "blog-training-db" {
   deletion_protection = false # 検証で作成するため、あとで消したい
 
   settings {
-  activation_policy     = "NEVER"
+    activation_policy = "ALWAYS"
     tier              = "db-f1-micro"
     availability_type = "ZONAL"
     disk_size         = "20"

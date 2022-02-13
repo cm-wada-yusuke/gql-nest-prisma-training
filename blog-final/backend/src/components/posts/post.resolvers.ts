@@ -1,5 +1,12 @@
 import { PrismaService } from './../prisma/prisma.service';
-import { Args, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
 import { PostModel } from '@pb-components/posts/interfaces/post.model';
 import { GetPostsArgs } from './interfaces/get-posts-connection.args';
 import { GoogleStorageRepository } from '@pb-components/bucket-assets/repositories/google-storage.repository';
@@ -7,6 +14,9 @@ import matter from 'gray-matter';
 import { FindPostArgs } from './interfaces/find-post-args';
 import { ImpressionService } from '@pb-components/impressions/impression.service';
 import { ImpressionModel } from '@pb-components/impressions/interfaces/impression.model';
+import { Post, Prisma } from '@prisma/client';
+import { Metadata } from '@google-cloud/logging-winston/build/src/common';
+import { zonedTimeToUtc } from 'date-fns-tz';
 
 @Resolver((of) => PostModel)
 export class PostsResolver {
@@ -71,9 +81,102 @@ export class PostsResolver {
     return content;
   }
 
-  @ResolveField(() => [ImpressionModel], { name: 'impressions', nullable: false })
+  @ResolveField(() => [ImpressionModel], {
+    name: 'impressions',
+    nullable: false,
+  })
   async impressions(@Parent() post: PostModel) {
     const { id } = post;
     return this.impressionService.search({ postId: id });
+  }
+
+  @Mutation(() => String)
+  async upsertPostsFromStorage(
+    @Args({ name: 'force', nullable: true, type: () => Boolean })
+    force?: boolean,
+  ): Promise<string> {
+    let pathsNumber = 0;
+    let updateNumber = 0;
+    for await (const gcsFilePaths of this.gcsRepository.getAllMarkdownPaths()) {
+      pathsNumber += gcsFilePaths.length;
+      for (const gcsFilePath of gcsFilePaths) {
+        updateNumber += await this.upsertPost(gcsFilePath, force);
+      }
+    }
+    return `${pathsNumber} GCS Paths, ${updateNumber} updated.`;
+  }
+
+  private async upsertPost(
+    gcsFilePath: string,
+    force?: boolean,
+  ): Promise<number> {
+    // gcsで管理されているファイルのメタデータを取得
+    const metadata = await this.gcsRepository.getFileMetadata(gcsFilePath);
+
+    // パスとmd5 hash が一致する場合は何もしない
+    // そうでない場合はupsert
+    // ほんとうはConditional Updateした
+    // https://github.com/prisma/prisma/issues/5108
+    const persisted = await this.prisma.post.findUnique({
+      where: {
+        contentPath: gcsFilePath,
+      },
+      rejectOnNotFound: false,
+    });
+
+    // 続行是非の判定
+    const proceed = (persisted: Post, metadata: Metadata): boolean => {
+      if (force === true) {
+        // 強制実行の場合は続行
+        return true;
+      }
+      if (!persisted) {
+        // まだ作られていなければ続行
+        return true;
+      }
+      return persisted.md5Hash !== metadata.md5Hash; // md5Hash が異なる場合は続行
+    };
+
+    console.log('proceed', proceed(persisted, metadata));
+
+    if (!proceed(persisted, metadata)) {
+      return 0;
+    }
+    // upsertする場合
+    const file = await this.gcsRepository.download(gcsFilePath);
+
+    // Markdown コンテンツから matter を抽出
+    const input = this.matterData(file, gcsFilePath, metadata.md5Hash);
+
+    await this.prisma.post.upsert({
+      where: {
+        contentPath: gcsFilePath,
+      },
+      create: input,
+      update: input,
+    });
+    return 1;
+  }
+
+  private matterData(
+    markdown: string,
+    contentPath: string,
+    md5Hash: string,
+  ): Prisma.PostCreateInput {
+    const { data } = matter(markdown);
+
+    return {
+      title: data.title,
+      emoji: data.emoji,
+      type: data.type,
+      contentPath,
+      md5Hash,
+      thumbNailUrl: data?.thumbNailUrl,
+      excerpt: data?.excerpt,
+      published: data?.published,
+      publishDate: data?.publishDate
+        ? zonedTimeToUtc(data.publishDate, 'Asia/Tokyo')
+        : undefined,
+    };
   }
 }

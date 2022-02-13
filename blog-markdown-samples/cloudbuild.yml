@@ -1,0 +1,43 @@
+steps:
+  - id: upload-contents
+    name: gcr.io/cloud-builders/gsutil
+    entrypoint: gsutil
+    args:
+      - rsync
+      - "-d"
+      - "-r"
+      - .
+      - "${_CONTENTS_BUCKET_URL}/posts"
+    dir: blog-markdown-samples
+  - id: import-contents
+    name: gcr.io/cloud-builders/gcloud
+    entrypoint: bash
+    args:
+      - "-c"
+      - >-
+        RESPONSE=$(curl -i -X POST -H "Content-Type: application/json" "$$GRAPHQL_ENDPOINT" --data '{ "query": "mutation { upsertPostsFromStorage }" }' | grep HTTP |
+        cut -d' ' -f2) && if [ "200" != "$$RESPONSE" ];then exit 1;fi
+    dir: blog-markdown-samples
+    secretEnv: ["GRAPHQL_ENDPOINT"]
+    waitFor: ["upload-contents"]
+  - id: notify-for-upload-contents
+    name: gcr.io/cloud-builders/curl
+    args:
+      - -X
+      - POST
+      - -H
+      - "Content-type: application/json"
+      - --data
+      - |
+        { "value1": "コンテンツ($SHORT_SHA)" }
+      - $_IFTTT_URL
+    waitFor: ["import-contents"]
+substitutions:
+  _REGION: by-terraform
+  _IFTTT_URL: by-terraform
+  _CONTENTS_BUCKET_URL: by-terraform
+timeout: 3600s
+availableSecrets:
+  secretManager:
+    - versionName: projects/$PROJECT_ID/secrets/BLOG_TRAINING_GRAPHQL_ENDPOINT/versions/latest
+      env: GRAPHQL_ENDPOINT
