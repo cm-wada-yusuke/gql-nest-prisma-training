@@ -56,4 +56,8 @@ module "cloud-build" {
   frontend_app_name           = local.frontend_app_name
   github_owner                = "cm-wada-yusuke"
   github_app_repo_name        = "gql-nest-prisma-training"
+  github_contents_repo_name   = "gql-nest-prisma-training"
+  contents_bucket_name        = module.cloud-storage.contents_bucket_name
+  contents_bucket_url         = module.cloud-storage.contents_bucket_url
+  ifttt_url                   = var.ifttt_url
 }
