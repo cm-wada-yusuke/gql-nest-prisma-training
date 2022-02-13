@@ -63,7 +63,7 @@ resource "google_cloudbuild_trigger" "deploy-training-contents" {
     }
   }
   included_files = ["blog-markdown-samples/**"]
-  filename       = "cloudbuild.yml"
+  filename       = "blog-markdown-samples/cloudbuild.yml"
   substitutions = {
     _REGION              = var.region
     _IFTTT_URL           = var.ifttt_url
