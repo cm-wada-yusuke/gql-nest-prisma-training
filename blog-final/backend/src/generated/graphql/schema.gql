@@ -30,6 +30,7 @@ type ImpressionModel {
 
 type Mutation {
   addImpression(input: CreateImpressionInput!): ImpressionModel!
+  upsertPostsFromStorage(force: Boolean): String!
 }
 
 interface Node {
