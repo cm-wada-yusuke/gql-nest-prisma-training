@@ -1,0 +1,32 @@
+.userSelect {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar {
+  display: block;
+  border-radius: 50%;
+  height: auto;
+  flex-shrink: 0;
+  font-size: 11px;
+  border: solid 3px #a6a6a6;
+}
+
+.container {
+  font-size: 20px;
+  :global {
+    .rs__value-container {
+      padding: 0.7rem;
+    }
+    .rs__single-value {
+      display: flex;
+      align-items: center;
+    }
+    .rs__option {
+      display: flex;
+      align-items: center;
+    }
+  }
+}
